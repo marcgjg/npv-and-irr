@@ -163,8 +163,8 @@ with col_left:
         st.markdown('</div>', unsafe_allow_html=True)
         
         # Calculate and display initial investment and total cash inflows
-        init_investment = cash_flows[0] if cash_flows[0] < 0 else 0
-        total_inflows = sum(cf for cf in cash_flows if cf > 0)
+        # init_investment = cash_flows[0] if cash_flows[0] < 0 else 0
+        # total_inflows = sum(cf for cf in cash_flows if cf > 0)
         
         col1, col2 = st.columns(2)
         with col1:
