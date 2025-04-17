@@ -484,8 +484,8 @@ if valid_input:
             ### Limitations
             
             - Multiple IRRs can exist if cash flows change sign more than once
-            - IRR assumes reinvestment at the IRR rate itself, which may be unrealistic
             - IRR may give misleading results when comparing mutually exclusive projects
+            - The simple IRR won't work, if the discount rate changes over time
             """)
 
 # Footer
