@@ -97,6 +97,13 @@ with st.expander("ℹ️ About this tool", expanded=False):
     Enter your cash flows as comma-separated values, with the initial investment as a negative number.
     """)
 
+# Initialize session state for template button
+if "use_template" not in st.session_state:
+    st.session_state.use_template = False
+
+def set_template():
+    st.session_state.use_template = True
+
 # Create two columns: left for controls; right for diagram
 col_left, col_right = st.columns([1, 2])
 
@@ -105,12 +112,19 @@ with col_left:
     st.markdown('<div class="card">', unsafe_allow_html=True)
     st.markdown('<div class="subheader">Cash Flow Inputs</div>', unsafe_allow_html=True)
     
+    # Default value logic
+    default_cash_flows = "-1000, 300, 400, 500, 600" if st.session_state.use_template else "-1000, 300, 400, 500, 600"
+    
     # Let students enter cash flows as comma-separated values
     cash_flow_input = st.text_area(
         "Enter cash flows for each period (comma separated):",
-        "-1000, 300, 400, 500, 600",
+        default_cash_flows,
         help="Enter the initial investment as a negative number, followed by the cash inflows"
     )
+    
+    # Reset the template flag after use
+    if st.session_state.use_template:
+        st.session_state.use_template = False
     
     # Convert the cash flow input into a list of floats
     try:
@@ -120,10 +134,9 @@ with col_left:
         st.markdown('<div class="warning-box">Invalid input. Please enter valid numbers separated by commas.</div>', unsafe_allow_html=True)
         valid_input = False
     
-    # Option to add a template
-    if st.button("📋 Use Example Template"):
-        cash_flow_input = "-1000, 300, 400, 500, 600"
-        st.experimental_rerun()
+    # Option to add a template - using the callback function
+    if st.button("📋 Use Example Template", on_click=set_template):
+        pass  # The callback function will handle setting the template flag
     
     st.markdown('</div>', unsafe_allow_html=True)
     
@@ -387,8 +400,8 @@ if valid_input:
             ### Limitations
             
             - Multiple IRRs can exist if cash flows change sign more than once
+            - IRR assumes reinvestment at the IRR rate itself, which may be unrealistic
             - IRR may give misleading results when comparing mutually exclusive projects
-            - Simple IRR does not work if discount rate changes over time
             """)
 
 # Footer
