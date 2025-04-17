@@ -223,19 +223,71 @@ with col_left:
 def compute_npv(cash_flows, r):
     return sum(cf / ((1 + r) ** t) for t, cf in enumerate(cash_flows))
 
+# Function to find multiple IRRs
+def find_multiple_irrs(cash_flows, rate_min=0.0001, rate_max=0.9999, precision=0.0001):
+    """Find multiple IRRs if they exist by identifying zero-crossings in the NPV function."""
+    # Generate a dense set of rates for precise zero detection
+    dense_rates = np.linspace(rate_min, rate_max, 10000)
+    dense_npvs = [compute_npv(cash_flows, r) for r in dense_rates]
+    
+    # Find where the NPV changes sign (zero crossings)
+    zero_crossings = []
+    for i in range(1, len(dense_npvs)):
+        if dense_npvs[i-1] * dense_npvs[i] <= 0:  # Sign change detected
+            # Binary search to find more precise IRR
+            low, high = dense_rates[i-1], dense_rates[i]
+            while high - low > precision:
+                mid = (low + high) / 2
+                npv_mid = compute_npv(cash_flows, mid)
+                if npv_mid * compute_npv(cash_flows, low) <= 0:
+                    high = mid
+                else:
+                    low = mid
+            zero_crossings.append((low + high) / 2)
+    
+    # Count sign changes in cash flows to check if multiple IRRs are theoretically possible
+    sign_changes = sum(1 for i in range(1, len(cash_flows)) if cash_flows[i-1] * cash_flows[i] < 0)
+    
+    # Filter out very close values (could be duplicates due to numerical precision)
+    if len(zero_crossings) > 1:
+        filtered = [zero_crossings[0]]
+        for irr in zero_crossings[1:]:
+            if min(abs(irr - existing) for existing in filtered) > 0.01:  # 1% difference threshold
+                filtered.append(irr)
+        zero_crossings = filtered
+    
+    return zero_crossings, sign_changes
+
 if valid_input:
     # Generate a set of discount rates to evaluate
     rates = np.linspace(min_rate_dec, max_rate_dec, num_points)
     npv_values = [compute_npv(cash_flows, r) for r in rates]
     
-    # Calculate the IRR using numpy_financial
+    # Find multiple IRRs if they exist
+    irrs, sign_changes = find_multiple_irrs(cash_flows)
+    
+    # Check if we found any valid IRRs
+    irr_valid = len(irrs) > 0
+    multiple_irrs = len(irrs) > 1
+    
+    # Also try numpy_financial's IRR method as a backup
     try:
-        irr = npf.irr(cash_flows)
-        irr_percent = irr * 100
-        irr_valid = True
+        npf_irr = npf.irr(cash_flows)
+        # Add this IRR if it's not already in our list (within a tolerance)
+        if irr_valid and all(abs(npf_irr - irr) > 0.01 for irr in irrs):
+            irrs.append(npf_irr)
+        elif not irr_valid:
+            irrs = [npf_irr]
+            irr_valid = True
     except Exception:
-        irr = None
-        irr_valid = False
+        # Our custom algorithm may have found IRRs even if numpy_financial didn't
+        pass
+    
+    # Sort IRRs for display purposes
+    if irr_valid:
+        irrs.sort()
+        # Convert to percentages
+        irrs_percent = [irr * 100 for irr in irrs]
     
     with col_right:
         # Card for NPV visualization
@@ -268,53 +320,59 @@ if valid_input:
             )
         )
         
-        # If IRR is computed and lies within the selected discount rate range, mark it
-        if irr_valid and (min_rate <= (irr * 100) <= max_rate):
-            npv_at_irr = compute_npv(cash_flows, irr)
+        # If IRRs are computed and lie within the selected discount rate range, mark them
+        if irr_valid:
+            # Colors for multiple IRRs if needed
+            irr_colors = ['red', 'purple', 'orange', 'green']
             
-            # Add IRR point
-            fig.add_trace(go.Scatter(
-                x=[irr * 100],
-                y=[npv_at_irr],
-                mode='markers',
-                marker=dict(size=12, color='red', symbol='circle'),
-                name=f'IRR = {irr_percent:.2f}%',
-                hovertemplate='IRR: %{x:.2f}%<br>NPV: €%{y:.2f}<extra></extra>'
-            ))
-            
-            # Add IRR vertical line
-            fig.add_shape(
-                type="line",
-                x0=irr * 100,
-                y0=min(npv_values) if min(npv_values) < 0 else 0,
-                x1=irr * 100,
-                y1=0,
-                line=dict(
-                    color="red",
-                    width=1,
-                    dash="dash",
-                )
-            )
-            
-            # Add IRR annotation
-            fig.add_annotation(
-                x=irr * 100,
-                y=0,
-                text=f"IRR: {irr_percent:.2f}%",
-                showarrow=True,
-                arrowhead=2,
-                arrowsize=1,
-                arrowwidth=2,
-                arrowcolor="red",
-                ax=0,
-                ay=-40,
-                bordercolor="red",
-                borderwidth=2,
-                borderpad=4,
-                bgcolor="white",
-                opacity=0.8,
-                font=dict(color="red")
-            )
+            for idx, (irr, irr_percent) in enumerate(zip(irrs, irrs_percent)):
+                if min_rate <= irr_percent <= max_rate:
+                    color = irr_colors[idx % len(irr_colors)]
+                    npv_at_irr = compute_npv(cash_flows, irr)
+                    
+                    # Add IRR point
+                    fig.add_trace(go.Scatter(
+                        x=[irr_percent],
+                        y=[npv_at_irr],
+                        mode='markers',
+                        marker=dict(size=12, color=color, symbol='circle'),
+                        name=f'IRR {idx+1} = {irr_percent:.2f}%',
+                        hovertemplate='IRR {}: %{{x:.2f}}%<br>NPV: €%{{y:.2f}}<extra></extra>'.format(idx+1)
+                    ))
+                    
+                    # Add IRR vertical line
+                    fig.add_shape(
+                        type="line",
+                        x0=irr_percent,
+                        y0=min(npv_values) if min(npv_values) < 0 else 0,
+                        x1=irr_percent,
+                        y1=0,
+                        line=dict(
+                            color=color,
+                            width=1,
+                            dash="dash",
+                        )
+                    )
+                    
+                    # Add IRR annotation
+                    fig.add_annotation(
+                        x=irr_percent,
+                        y=0,
+                        text=f"IRR {idx+1}: {irr_percent:.2f}%",
+                        showarrow=True,
+                        arrowhead=2,
+                        arrowsize=1,
+                        arrowwidth=2,
+                        arrowcolor=color,
+                        ax=0,
+                        ay=-40 - (idx * 30),  # Stagger annotations
+                        bordercolor=color,
+                        borderwidth=2,
+                        borderpad=4,
+                        bgcolor="white",
+                        opacity=0.8,
+                        font=dict(color=color)
+                    )
         
         # Customize the layout
         fig.update_layout(
@@ -351,24 +409,39 @@ if valid_input:
         if irr_valid:
             st.markdown('<div class="results-box">', unsafe_allow_html=True)
             
-            # Create columns for results
-            res_col1, res_col2 = st.columns(2)
+            # Calculate NPV at a common discount rate (10%)
+            standard_rate = 0.10  # 10%
+            npv_at_standard = compute_npv(cash_flows, standard_rate)
             
-            with res_col1:
-                st.markdown(f"**Internal Rate of Return (IRR):** {irr_percent:.2f}%")
+            if multiple_irrs:
+                st.markdown(f"**Multiple Internal Rates of Return (IRRs) Found:**")
+                irr_list = ", ".join([f"{irr:.2f}%" for irr in irrs_percent])
+                st.markdown(f"IRR values: {irr_list}")
+                st.markdown(f"*This project has {len(irrs)} discount rates at which NPV equals zero.*")
+                
+                # Add info about multiple IRRs
+                st.markdown("""
+                <div style="background-color: #FFFBEB; padding: 0.75rem; border-radius: 0.375rem; border-left: 4px solid #F59E0B; margin-top: 0.5rem;">
+                    <b>Note:</b> Multiple IRRs indicate a complex investment pattern. When multiple IRRs exist, 
+                    the decision to accept or reject the project should consider additional factors beyond just IRR.
+                </div>
+                """, unsafe_allow_html=True)
+            else:
+                st.markdown(f"**Internal Rate of Return (IRR):** {irrs_percent[0]:.2f}%")
                 st.markdown("*The discount rate at which NPV equals zero*")
             
-            with res_col2:
-                # Calculate NPV at a common discount rate (10%)
-                standard_rate = 0.10  # 10%
-                npv_at_standard = compute_npv(cash_flows, standard_rate)
-                st.markdown(f"**NPV at 10% discount rate:** €{npv_at_standard:,.2f}")
+            st.markdown(f"**NPV at 10% discount rate:** €{npv_at_standard:,.2f}")
+            
+            # Add sign changes information
+            if sign_changes > 1:
+                st.markdown(f"**Cash flow sign changes:** {sign_changes}")
+                st.markdown("*Multiple sign changes can lead to multiple IRRs*")
                 
             st.markdown('</div>', unsafe_allow_html=True)
         else:
             st.markdown('<div class="warning-box">', unsafe_allow_html=True)
             st.markdown("**No valid IRR found within the given range.**")
-            st.markdown("This usually happens when the cash flows don't change sign (from negative to positive or vice versa).")
+            st.markdown("This usually happens when the cash flows don't change sign (from negative to positive or vice versa) or when all IRRs fall outside the selected discount rate range.")
             st.markdown('</div>', unsafe_allow_html=True)
         
         st.markdown('</div>', unsafe_allow_html=True)
@@ -396,6 +469,17 @@ if valid_input:
             
             - If IRR > Required Rate of Return: Accept the project
             - If IRR < Required Rate of Return: Reject the project
+            
+            ### Multiple IRRs
+            
+            When cash flows change sign more than once (e.g., negative, then positive, then negative again), 
+            multiple IRRs can exist. This happens in projects with:
+            
+            - Large maintenance costs or decommissioning expenses later in the project
+            - Projects with multiple phases of investment and returns
+            - Unconventional cash flow patterns
+            
+            In such cases, the IRR decision rule becomes ambiguous, and it's better to rely on the NPV method.
             
             ### Limitations
             
