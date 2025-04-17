@@ -113,7 +113,7 @@ with col_left:
     st.markdown('<div class="subheader">Cash Flow Inputs</div>', unsafe_allow_html=True)
     
     # Default value logic
-    default_cash_flows = "-1000, 300, 400, 500, 600" if st.session_state.use_template else "-1000, 300, 400, 500, 600"
+    default_cash_flows = "-1000, 300, 400, 500, 600" if st.session_state.use_template else ""
     
     # Let students enter cash flows as comma-separated values
     cash_flow_input = st.text_area(
