@@ -172,7 +172,7 @@ with col_left:
         # with col2:
         #    st.metric("Total Cash Inflows", f"€{total_inflows:,.2f}")
         
-        st.markdown('</div>', unsafe_allow_html=True)
+        # st.markdown('</div>', unsafe_allow_html=True)
     
     # Card for discount rate controls
     st.markdown('<div class="card">', unsafe_allow_html=True)
