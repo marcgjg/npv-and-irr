@@ -331,14 +331,14 @@ if valid_input:
                     color = irr_colors[idx % len(irr_colors)]
                     npv_at_irr = compute_npv(cash_flows, irr)
                     
-                # Add IRR point with space after percentage
+                # Add IRR point with alternative approach
                 fig.add_trace(go.Scatter(
                     x=[irr_percent],
                     y=[npv_at_irr],
                     mode='markers',
                     marker=dict(size=12, color=color, symbol='circle'),
-                    # Add space after percentage symbol
-                    name=f'IRR {idx+1} = {irr_percent:.2f}% ',  # Space after %
+                    # Use "pct" instead of % symbol
+                    name=f'IRR {idx+1} = {irr_percent:.2f} pct',
                     hovertemplate='IRR {}: %{{x:.2f}}%<br>NPV: €%{{y:.2f}}<extra></extra>'.format(idx+1)
                 ))
                 
@@ -356,12 +356,12 @@ if valid_input:
                     )
                 )
                 
-                # Add IRR annotation with space after percentage
+                # Add IRR annotation with alternative approach
                 fig.add_annotation(
                     x=irr_percent,
                     y=0,
-                    # Add space after percentage symbol
-                    text=f"IRR {idx+1}: {irr_percent:.2f}% ",  # Space after %
+                    # Use "pct" instead of % symbol
+                    text=f"IRR {idx+1}: {irr_percent:.2f} pct",
                     showarrow=True,
                     arrowhead=2,
                     arrowsize=1,
@@ -421,11 +421,11 @@ if valid_input:
         # Display the chart with high-resolution export config
         st.plotly_chart(fig, use_container_width=True, config={
             'toImageButtonOptions': {
-                'format': 'png', 
+                'format': 'svg',  # Use SVG instead of PNG for better text handling
                 'filename': 'npv_irr_chart',
-                'height': 800,  # Much taller export
-                'width': 1200,  # Much wider export
-                'scale': 4  # Higher scale for better resolution (4x)
+                'height': 800,
+                'width': 1200,
+                'scale': 2  # Scale is less important for SVG
             }
         })
         
