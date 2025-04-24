@@ -80,12 +80,6 @@ st.markdown("""
         border-left: 4px solid #EF4444;
         margin-top: 1rem;
     }
-    .toggle-container {
-        background-color: #EFF6FF;
-        border-radius: 8px;
-        padding: 0.75rem;
-        margin-bottom: 1rem;
-    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -196,62 +190,18 @@ with col_left:
     min_rate_dec = min_rate / 100.0
     max_rate_dec = max_rate / 100.0
     
-    # Add resolution control
-    resolution = st.select_slider(
-        "Chart Resolution:",
-        options=["Low", "Medium", "High", "Ultra High"],
-        value="Medium",
-        help="Higher resolution shows more data points but may be slower"
-    )
-    
-    resolution_points = {"Low": 50, "Medium": 100, "High": 200, "Ultra High": 500}
-    num_points = resolution_points[resolution]
-    
-    st.markdown('</div>', unsafe_allow_html=True)
-    
-    # Card for plot settings
-    st.markdown('<div class="card">', unsafe_allow_html=True)
-    st.markdown('<div class="subheader">Plot Settings</div>', unsafe_allow_html=True)
-    
-    # Plot size and margin controls
-    plot_height = st.slider(
-        "Plot Height (pixels):", 
-        min_value=400, 
-        max_value=1000, 
-        value=600,
-        step=50,
-        help="Adjust the height of the plot"
-    )
-    
-    # Legend positioning options
-    legend_position = st.radio(
-        "Legend Position:",
-        options=["Bottom", "Right", "Top", "Left"],
+    # Simplified resolution control - using High as default
+    resolution = st.radio(
+        "Chart Detail Level:",
+        options=["Standard", "High"],
+        index=1,  # Default to High
         horizontal=True,
-        help="Position of the legend to ensure it's visible in exports"
+        help="High detail provides a smoother curve and better exports"
     )
     
-    # Toggle for extra margins
-    st.markdown('<div class="toggle-container">', unsafe_allow_html=True)
-    extra_margins = st.checkbox(
-        "Add extra margins for exports", 
-        value=True,
-        help="Adds extra space around the plot to ensure everything is visible when exported"
-    )
+    # Set number of points based on resolution choice
+    num_points = 500 if resolution == "High" else 100
     
-    if extra_margins:
-        margin_size = st.slider(
-            "Margin Size:", 
-            min_value=40, 
-            max_value=120, 
-            value=80,
-            step=10,
-            help="Size of margins around the plot (in pixels)"
-        )
-    else:
-        margin_size = 60  # Default margin
-    
-    st.markdown('</div>', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
     
     # Information box
@@ -425,16 +375,7 @@ if valid_input:
                         font=dict(color=color)
                     )
         
-        # Set legend position based on user selection
-        legend_positions = {
-            "Bottom": dict(orientation="h", yanchor="top", y=-0.15, xanchor="center", x=0.5),
-            "Right": dict(yanchor="middle", y=0.5, xanchor="left", x=1.05),
-            "Top": dict(orientation="h", yanchor="bottom", y=1.15, xanchor="center", x=0.5),
-            "Left": dict(yanchor="middle", y=0.5, xanchor="right", x=-0.05)
-        }
-        legend_config = legend_positions[legend_position]
-        
-        # Customize the layout
+        # Customize the layout with optimized settings for better exports by default
         fig.update_layout(
             title=dict(
                 text="NPV vs. Discount Rate",
@@ -458,25 +399,23 @@ if valid_input:
             plot_bgcolor='rgba(248, 250, 252, 0.5)',
             paper_bgcolor='rgba(0,0,0,0)',
             hovermode='closest',
-            height=plot_height,
-            margin=dict(l=margin_size, r=margin_size, t=margin_size, b=margin_size),
-            legend=legend_config,
-            # Additional setting for better export quality
+            height=600,
+            # Generous margins by default to prevent cutoff in exports
+            margin=dict(l=80, r=80, t=100, b=100),
+            # Bottom legend by default to avoid right side cutoff
+            legend=dict(orientation="h", yanchor="top", y=-0.15, xanchor="center", x=0.5),
             autosize=False,
-            width=int(plot_height * 1.5)  # Keep aspect ratio consistent
+            width=900  # Fixed width for consistent exports
         )
         
-        # Add download instructions
-        st.info("To download this plot at high resolution, click the camera icon in the plot toolbar.")
-        
-        # Display the chart
+        # Display the chart with high-resolution export config
         st.plotly_chart(fig, use_container_width=True, config={
             'toImageButtonOptions': {
                 'format': 'png', 
                 'filename': 'npv_irr_chart',
-                'height': plot_height,
-                'width': int(plot_height * 1.5),
-                'scale': 3  # Higher scale for better resolution
+                'height': 600,
+                'width': 900,
+                'scale': 3  # Higher scale for better resolution (3x)
             }
         })
         
