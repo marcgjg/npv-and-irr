@@ -337,8 +337,8 @@ if valid_input:
                     y=[npv_at_irr],
                     mode='markers',
                     marker=dict(size=12, color=color, symbol='circle'),
-                    # Remove percentage sign from name to avoid cutoff issues
-                    name=f'IRR {idx+1} = {irr_percent:.2f}',  # No % in name
+                    # Add space before percentage symbol
+                    name=f'IRR {idx+1} = {irr_percent:.2f} %',  # Space before %
                     hovertemplate='IRR {}: %{{x:.2f}}%<br>NPV: €%{{y:.2f}}<extra></extra>'.format(idx+1)
                 ))
                 
@@ -356,12 +356,12 @@ if valid_input:
                     )
                 )
                 
-                # Add IRR annotation - with more space and simpler format
+                # Add IRR annotation with space before percentage
                 fig.add_annotation(
                     x=irr_percent,
                     y=0,
-                    # Remove percentage sign from annotation text to avoid cutoff
-                    text=f"IRR {idx+1}: {irr_percent:.2f}",  # No % in annotation
+                    # Add space before percentage symbol
+                    text=f"IRR {idx+1}: {irr_percent:.2f} %",  # Space before %
                     showarrow=True,
                     arrowhead=2,
                     arrowsize=1,
