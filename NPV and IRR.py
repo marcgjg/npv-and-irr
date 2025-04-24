@@ -331,14 +331,14 @@ if valid_input:
                     color = irr_colors[idx % len(irr_colors)]
                     npv_at_irr = compute_npv(cash_flows, irr)
                     
-                # Add IRR point with modified trace name format
+                # Add IRR point with space after percentage
                 fig.add_trace(go.Scatter(
                     x=[irr_percent],
                     y=[npv_at_irr],
                     mode='markers',
                     marker=dict(size=12, color=color, symbol='circle'),
-                    # Add space before percentage symbol
-                    name=f'IRR {idx+1} = {irr_percent:.2f} %',  # Space before %
+                    # Add space after percentage symbol
+                    name=f'IRR {idx+1} = {irr_percent:.2f}% ',  # Space after %
                     hovertemplate='IRR {}: %{{x:.2f}}%<br>NPV: €%{{y:.2f}}<extra></extra>'.format(idx+1)
                 ))
                 
@@ -356,12 +356,12 @@ if valid_input:
                     )
                 )
                 
-                # Add IRR annotation with space before percentage
+                # Add IRR annotation with space after percentage
                 fig.add_annotation(
                     x=irr_percent,
                     y=0,
-                    # Add space before percentage symbol
-                    text=f"IRR {idx+1}: {irr_percent:.2f} %",  # Space before %
+                    # Add space after percentage symbol
+                    text=f"IRR {idx+1}: {irr_percent:.2f}% ",  # Space after %
                     showarrow=True,
                     arrowhead=2,
                     arrowsize=1,
