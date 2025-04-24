@@ -341,41 +341,41 @@ if valid_input:
                     name=f'IRR {idx+1} = {irr_percent:.2f}',  # No % in name
                     hovertemplate='IRR {}: %{{x:.2f}}%<br>NPV: €%{{y:.2f}}<extra></extra>'.format(idx+1)
                 ))
-                    
-                    # Add IRR vertical line
-                    fig.add_shape(
-                        type="line",
-                        x0=irr_percent,
-                        y0=min(npv_values) if min(npv_values) < 0 else 0,
-                        x1=irr_percent,
-                        y1=0,
-                        line=dict(
-                            color=color,
-                            width=1,
-                            dash="dash",
-                        )
+                
+                # Add IRR vertical line
+                fig.add_shape(
+                    type="line",
+                    x0=irr_percent,
+                    y0=min(npv_values) if min(npv_values) < 0 else 0,
+                    x1=irr_percent,
+                    y1=0,
+                    line=dict(
+                        color=color,
+                        width=1,
+                        dash="dash",
                     )
-                    
-                    # Add IRR annotation - with more space and simpler format
-                    fig.add_annotation(
-                        x=irr_percent,
-                        y=0,
-                        # Remove percentage sign from annotation text to avoid cutoff
-                        text=f"IRR {idx+1}: {irr_percent:.2f}",  # No % in annotation
-                        showarrow=True,
-                        arrowhead=2,
-                        arrowsize=1,
-                        arrowwidth=2,
-                        arrowcolor=color,
-                        ax=0,
-                        ay=-40 - (idx * 30),  # Stagger annotations
-                        bordercolor=color,
-                        borderwidth=2,
-                        borderpad=8,  # Very large padding inside text box
-                        bgcolor="white",
-                        opacity=0.8,
-                        font=dict(color=color, size=14)  # Larger font size
-                    )
+                )
+                
+                # Add IRR annotation - with more space and simpler format
+                fig.add_annotation(
+                    x=irr_percent,
+                    y=0,
+                    # Remove percentage sign from annotation text to avoid cutoff
+                    text=f"IRR {idx+1}: {irr_percent:.2f}",  # No % in annotation
+                    showarrow=True,
+                    arrowhead=2,
+                    arrowsize=1,
+                    arrowwidth=2,
+                    arrowcolor=color,
+                    ax=0,
+                    ay=-40 - (idx * 30),  # Stagger annotations
+                    bordercolor=color,
+                    borderwidth=2,
+                    borderpad=8,  # Very large padding inside text box
+                    bgcolor="white",
+                    opacity=0.8,
+                    font=dict(color=color, size=14)  # Larger font size
+                )
         
         # Customize the layout with optimized settings for better exports by default
         fig.update_layout(
