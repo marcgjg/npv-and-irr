@@ -331,14 +331,14 @@ if valid_input:
                     color = irr_colors[idx % len(irr_colors)]
                     npv_at_irr = compute_npv(cash_flows, irr)
                     
-                # Add IRR point with alternative approach
+                # Add IRR point with percentage symbol restored
                 fig.add_trace(go.Scatter(
                     x=[irr_percent],
                     y=[npv_at_irr],
                     mode='markers',
                     marker=dict(size=12, color=color, symbol='circle'),
-                    # Use "pct" instead of % symbol
-                    name=f'IRR {idx+1} = {irr_percent:.2f} pct',
+                    # Restore percentage symbol
+                    name=f'IRR {idx+1} = {irr_percent:.2f}%',
                     hovertemplate='IRR {}: %{{x:.2f}}%<br>NPV: €%{{y:.2f}}<extra></extra>'.format(idx+1)
                 ))
                 
@@ -356,12 +356,12 @@ if valid_input:
                     )
                 )
                 
-                # Add IRR annotation with alternative approach
+                # Add IRR annotation with percentage symbol restored
                 fig.add_annotation(
                     x=irr_percent,
                     y=0,
-                    # Use "pct" instead of % symbol
-                    text=f"IRR {idx+1}: {irr_percent:.2f} pct",
+                    # Restore percentage symbol
+                    text=f"IRR {idx+1}: {irr_percent:.2f}%",
                     showarrow=True,
                     arrowhead=2,
                     arrowsize=1,
@@ -418,14 +418,14 @@ if valid_input:
             width=1000  # Wider for consistent exports
         )
         
-        # Display the chart with high-resolution export config
+        # Display the chart with improved SVG export config
         st.plotly_chart(fig, use_container_width=True, config={
             'toImageButtonOptions': {
-                'format': 'svg',  # Use SVG instead of PNG for better text handling
+                'format': 'svg',
                 'filename': 'npv_irr_chart',
-                'height': 800,
-                'width': 1200,
-                'scale': 2  # Scale is less important for SVG
+                'height': 1200,  # Increased for higher quality
+                'width': 1800,   # Increased for higher quality
+                'scale': 3       # Increased for better quality
             }
         })
         
