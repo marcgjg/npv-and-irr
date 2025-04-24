@@ -377,7 +377,7 @@ if valid_input:
                     font=dict(color=color, size=14)  # Larger font size
                 )
         
-        # Customize the layout with optimized settings for better exports by default
+        # Configure the plot for maximum quality
         fig.update_layout(
             title=dict(
                 text="NPV vs. Discount Rate",
@@ -387,11 +387,15 @@ if valid_input:
             ),
             xaxis=dict(
                 title="Discount Rate (%)",
+                titlefont=dict(size=18),
+                tickfont=dict(size=16),
                 tickformat='.1f',
                 gridcolor='rgba(230, 230, 230, 0.8)'
             ),
             yaxis=dict(
                 title="Net Present Value (€)",
+                titlefont=dict(size=18),
+                tickfont=dict(size=16),
                 tickformat=',.2f',
                 gridcolor='rgba(230, 230, 230, 0.8)',
                 zeroline=True,
@@ -401,32 +405,35 @@ if valid_input:
             plot_bgcolor='rgba(248, 250, 252, 0.5)',
             paper_bgcolor='rgba(0,0,0,0)',
             hovermode='closest',
-            height=650,  # Slightly taller
-            # Extra large margins to prevent cutoff in exports
+            height=700,
             margin=dict(l=100, r=100, t=100, b=150),  # Much larger bottom margin
-            # Bottom legend with more space
             legend=dict(
                 orientation="h", 
                 yanchor="top", 
                 y=-0.25,  # Much more space below the plot
                 xanchor="center", 
                 x=0.5,
-                font=dict(size=14),  # Larger font size for legend
+                font=dict(size=16),  # Larger font size for legend
                 itemsizing='constant'  # Consistent size for legend items
             ),
             autosize=False,
-            width=1000  # Wider for consistent exports
+            width=1050,  # Wider for consistent exports
+            showlegend=True
         )
         
-        # Display the chart with improved SVG export config
+        # Display the chart with maximum quality SVG export settings
         st.plotly_chart(fig, use_container_width=True, config={
             'toImageButtonOptions': {
                 'format': 'svg',
                 'filename': 'npv_irr_chart',
-                'height': 1200,  # Increased for higher quality
-                'width': 1800,   # Increased for higher quality
-                'scale': 3       # Increased for better quality
-            }
+                'height': 2400,  # Doubled for higher quality
+                'width': 3600,   # Doubled for higher quality
+                'scale': 4       # Maximum scale factor
+            },
+            'responsive': True,
+            'displayModeBar': True,
+            'displaylogo': False,
+            'modeBarButtonsToAdd': ['drawline', 'drawopenpath', 'eraseshape']
         })
         
         # Results section
