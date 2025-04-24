@@ -372,15 +372,31 @@ if valid_input:
                         borderpad=8,
                         bgcolor="white",
                         opacity=0.8,
-                        font=dict(color=color, size=14)
+                        font=dict(color=color, size=16)  # Increased font size
                     )
         
         # Customize the layout
         fig.update_layout(
-            title="NPV vs. Discount Rate",
-            xaxis_title="Discount Rate (%)",
-            yaxis_title="Net Present Value (€)",
-            legend=dict(orientation="h", y=-0.2, x=0.5),
+            title=dict(
+                text="NPV vs. Discount Rate",
+                font=dict(size=24)
+            ),
+            xaxis=dict(
+                title=dict(text="Discount Rate (%)", font=dict(size=18)),
+                tickfont=dict(size=14),
+                tickformat='.1f'
+            ),
+            yaxis=dict(
+                title=dict(text="Net Present Value (€)", font=dict(size=18)),
+                tickfont=dict(size=14),
+                tickformat=',.2f'
+            ),
+            legend=dict(
+                orientation="h", 
+                y=-0.2, 
+                x=0.5,
+                font=dict(size=16)
+            ),
             height=600,
             margin=dict(l=80, r=80, t=80, b=120)
         )
@@ -388,14 +404,14 @@ if valid_input:
         # Note about SVG export
         st.info("For high-quality exports, use the camera icon in the plot toolbar and select SVG format.")
         
-        # Display the chart with SVG export option
+        # Display the chart with improved SVG export options
         st.plotly_chart(fig, use_container_width=True, config={
             'toImageButtonOptions': {
                 'format': 'svg', 
                 'filename': 'npv_irr_chart',
-                'height': 1200,
-                'width': 1800,
-                'scale': 2
+                'width': 1000,   # Adjusted for better proportion
+                'height': 600,   # Match the displayed chart height
+                'scale': 2       # Maintain quality without scaling issues
             }
         })
         
