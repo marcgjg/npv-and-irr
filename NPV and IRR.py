@@ -331,15 +331,16 @@ if valid_input:
                     color = irr_colors[idx % len(irr_colors)]
                     npv_at_irr = compute_npv(cash_flows, irr)
                     
-                    # Add IRR point
-                    fig.add_trace(go.Scatter(
-                        x=[irr_percent],
-                        y=[npv_at_irr],
-                        mode='markers',
-                        marker=dict(size=12, color=color, symbol='circle'),
-                        name=f'IRR {idx+1} = {irr_percent:.2f}%',
-                        hovertemplate='IRR {}: %{{x:.2f}}%<br>NPV: €%{{y:.2f}}<extra></extra>'.format(idx+1)
-                    ))
+                # Add IRR point with modified trace name format
+                fig.add_trace(go.Scatter(
+                    x=[irr_percent],
+                    y=[npv_at_irr],
+                    mode='markers',
+                    marker=dict(size=12, color=color, symbol='circle'),
+                    # Remove percentage sign from name to avoid cutoff issues
+                    name=f'IRR {idx+1} = {irr_percent:.2f}',  # No % in name
+                    hovertemplate='IRR {}: %{{x:.2f}}%<br>NPV: €%{{y:.2f}}<extra></extra>'.format(idx+1)
+                ))
                     
                     # Add IRR vertical line
                     fig.add_shape(
@@ -355,11 +356,12 @@ if valid_input:
                         )
                     )
                     
-                    # Add IRR annotation
+                    # Add IRR annotation - with more space and simpler format
                     fig.add_annotation(
                         x=irr_percent,
                         y=0,
-                        text=f"IRR {idx+1}: {irr_percent:.2f}%",
+                        # Remove percentage sign from annotation text to avoid cutoff
+                        text=f"IRR {idx+1}: {irr_percent:.2f}",  # No % in annotation
                         showarrow=True,
                         arrowhead=2,
                         arrowsize=1,
@@ -369,10 +371,10 @@ if valid_input:
                         ay=-40 - (idx * 30),  # Stagger annotations
                         bordercolor=color,
                         borderwidth=2,
-                        borderpad=6,  # Increased padding inside text box
+                        borderpad=8,  # Very large padding inside text box
                         bgcolor="white",
                         opacity=0.8,
-                        font=dict(color=color, size=12)  # Explicit font size
+                        font=dict(color=color, size=14)  # Larger font size
                     )
         
         # Customize the layout with optimized settings for better exports by default
@@ -399,20 +401,21 @@ if valid_input:
             plot_bgcolor='rgba(248, 250, 252, 0.5)',
             paper_bgcolor='rgba(0,0,0,0)',
             hovermode='closest',
-            height=600,
-            # Generous margins by default to prevent cutoff in exports
-            margin=dict(l=80, r=80, t=100, b=100),
+            height=650,  # Slightly taller
+            # Extra large margins to prevent cutoff in exports
+            margin=dict(l=100, r=100, t=100, b=150),  # Much larger bottom margin
             # Bottom legend with more space
             legend=dict(
                 orientation="h", 
                 yanchor="top", 
-                y=-0.20,  # More space below the plot
+                y=-0.25,  # Much more space below the plot
                 xanchor="center", 
                 x=0.5,
-                font=dict(size=12)  # Explicit font size for legend
+                font=dict(size=14),  # Larger font size for legend
+                itemsizing='constant'  # Consistent size for legend items
             ),
             autosize=False,
-            width=900  # Fixed width for consistent exports
+            width=1000  # Wider for consistent exports
         )
         
         # Display the chart with high-resolution export config
@@ -420,9 +423,9 @@ if valid_input:
             'toImageButtonOptions': {
                 'format': 'png', 
                 'filename': 'npv_irr_chart',
-                'height': 700,  # Increased height for exports
-                'width': 1050,  # Increased width for exports
-                'scale': 3  # Higher scale for better resolution (3x)
+                'height': 800,  # Much taller export
+                'width': 1200,  # Much wider export
+                'scale': 4  # Higher scale for better resolution (4x)
             }
         })
         
