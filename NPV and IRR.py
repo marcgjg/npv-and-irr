@@ -369,10 +369,10 @@ if valid_input:
                         ay=-40 - (idx * 30),  # Stagger annotations
                         bordercolor=color,
                         borderwidth=2,
-                        borderpad=4,
+                        borderpad=6,  # Increased padding inside text box
                         bgcolor="white",
                         opacity=0.8,
-                        font=dict(color=color)
+                        font=dict(color=color, size=12)  # Explicit font size
                     )
         
         # Customize the layout with optimized settings for better exports by default
@@ -402,8 +402,15 @@ if valid_input:
             height=600,
             # Generous margins by default to prevent cutoff in exports
             margin=dict(l=80, r=80, t=100, b=100),
-            # Bottom legend by default to avoid right side cutoff
-            legend=dict(orientation="h", yanchor="top", y=-0.15, xanchor="center", x=0.5),
+            # Bottom legend with more space
+            legend=dict(
+                orientation="h", 
+                yanchor="top", 
+                y=-0.20,  # More space below the plot
+                xanchor="center", 
+                x=0.5,
+                font=dict(size=12)  # Explicit font size for legend
+            ),
             autosize=False,
             width=900  # Fixed width for consistent exports
         )
@@ -413,8 +420,8 @@ if valid_input:
             'toImageButtonOptions': {
                 'format': 'png', 
                 'filename': 'npv_irr_chart',
-                'height': 600,
-                'width': 900,
+                'height': 700,  # Increased height for exports
+                'width': 1050,  # Increased width for exports
                 'scale': 3  # Higher scale for better resolution (3x)
             }
         })
