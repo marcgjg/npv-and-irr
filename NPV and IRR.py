@@ -331,109 +331,72 @@ if valid_input:
                     color = irr_colors[idx % len(irr_colors)]
                     npv_at_irr = compute_npv(cash_flows, irr)
                     
-                # Add IRR point with percentage symbol restored
-                fig.add_trace(go.Scatter(
-                    x=[irr_percent],
-                    y=[npv_at_irr],
-                    mode='markers',
-                    marker=dict(size=12, color=color, symbol='circle'),
-                    # Restore percentage symbol
-                    name=f'IRR {idx+1} = {irr_percent:.2f}%',
-                    hovertemplate='IRR {}: %{{x:.2f}}%<br>NPV: €%{{y:.2f}}<extra></extra>'.format(idx+1)
-                ))
-                
-                # Add IRR vertical line
-                fig.add_shape(
-                    type="line",
-                    x0=irr_percent,
-                    y0=min(npv_values) if min(npv_values) < 0 else 0,
-                    x1=irr_percent,
-                    y1=0,
-                    line=dict(
-                        color=color,
-                        width=1,
-                        dash="dash",
+                    # Add IRR point
+                    fig.add_trace(go.Scatter(
+                        x=[irr_percent],
+                        y=[npv_at_irr],
+                        mode='markers',
+                        marker=dict(size=12, color=color, symbol='circle'),
+                        name=f'IRR {idx+1} = {irr_percent:.2f}%',
+                        hovertemplate='IRR {}: %{{x:.2f}}%<br>NPV: €%{{y:.2f}}<extra></extra>'.format(idx+1)
+                    ))
+                    
+                    # Add IRR vertical line
+                    fig.add_shape(
+                        type="line",
+                        x0=irr_percent,
+                        y0=min(npv_values) if min(npv_values) < 0 else 0,
+                        x1=irr_percent,
+                        y1=0,
+                        line=dict(
+                            color=color,
+                            width=1,
+                            dash="dash",
+                        )
                     )
-                )
-                
-                # Add IRR annotation with percentage symbol restored
-                fig.add_annotation(
-                    x=irr_percent,
-                    y=0,
-                    # Restore percentage symbol
-                    text=f"IRR {idx+1}: {irr_percent:.2f}%",
-                    showarrow=True,
-                    arrowhead=2,
-                    arrowsize=1,
-                    arrowwidth=2,
-                    arrowcolor=color,
-                    ax=0,
-                    ay=-40 - (idx * 30),  # Stagger annotations
-                    bordercolor=color,
-                    borderwidth=2,
-                    borderpad=8,  # Very large padding inside text box
-                    bgcolor="white",
-                    opacity=0.8,
-                    font=dict(color=color, size=14)  # Larger font size
-                )
+                    
+                    # Add IRR annotation
+                    fig.add_annotation(
+                        x=irr_percent,
+                        y=0,
+                        text=f"IRR {idx+1}: {irr_percent:.2f}%",
+                        showarrow=True,
+                        arrowhead=2,
+                        arrowsize=1,
+                        arrowwidth=2,
+                        arrowcolor=color,
+                        ax=0,
+                        ay=-40 - (idx * 30),  # Stagger annotations
+                        bordercolor=color,
+                        borderwidth=2,
+                        borderpad=8,
+                        bgcolor="white",
+                        opacity=0.8,
+                        font=dict(color=color, size=14)
+                    )
         
-        # Configure the plot for maximum quality
+        # Customize the layout
         fig.update_layout(
-            title=dict(
-                text="NPV vs. Discount Rate",
-                font=dict(size=24, family="Arial, sans-serif", color="#1E3A8A"),
-                x=0.5,
-                xanchor='center'
-            ),
-            xaxis=dict(
-                title="Discount Rate (%)",
-                titlefont=dict(size=18),
-                tickfont=dict(size=16),
-                tickformat='.1f',
-                gridcolor='rgba(230, 230, 230, 0.8)'
-            ),
-            yaxis=dict(
-                title="Net Present Value (€)",
-                titlefont=dict(size=18),
-                tickfont=dict(size=16),
-                tickformat=',.2f',
-                gridcolor='rgba(230, 230, 230, 0.8)',
-                zeroline=True,
-                zerolinecolor='rgba(0, 0, 0, 0.2)',
-                zerolinewidth=1
-            ),
-            plot_bgcolor='rgba(248, 250, 252, 0.5)',
-            paper_bgcolor='rgba(0,0,0,0)',
-            hovermode='closest',
-            height=700,
-            margin=dict(l=100, r=100, t=100, b=150),  # Much larger bottom margin
-            legend=dict(
-                orientation="h", 
-                yanchor="top", 
-                y=-0.25,  # Much more space below the plot
-                xanchor="center", 
-                x=0.5,
-                font=dict(size=16),  # Larger font size for legend
-                itemsizing='constant'  # Consistent size for legend items
-            ),
-            autosize=False,
-            width=1050,  # Wider for consistent exports
-            showlegend=True
+            title="NPV vs. Discount Rate",
+            xaxis_title="Discount Rate (%)",
+            yaxis_title="Net Present Value (€)",
+            legend=dict(orientation="h", y=-0.2, x=0.5),
+            height=600,
+            margin=dict(l=80, r=80, t=80, b=120)
         )
         
-        # Display the chart with maximum quality SVG export settings
+        # Note about SVG export
+        st.info("For high-quality exports, use the camera icon in the plot toolbar and select SVG format.")
+        
+        # Display the chart with SVG export option
         st.plotly_chart(fig, use_container_width=True, config={
             'toImageButtonOptions': {
-                'format': 'svg',
+                'format': 'svg', 
                 'filename': 'npv_irr_chart',
-                'height': 2400,  # Doubled for higher quality
-                'width': 3600,   # Doubled for higher quality
-                'scale': 4       # Maximum scale factor
-            },
-            'responsive': True,
-            'displayModeBar': True,
-            'displaylogo': False,
-            'modeBarButtonsToAdd': ['drawline', 'drawopenpath', 'eraseshape']
+                'height': 1200,
+                'width': 1800,
+                'scale': 2
+            }
         })
         
         # Results section
