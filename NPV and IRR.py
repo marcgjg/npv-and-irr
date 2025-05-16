@@ -499,4 +499,4 @@ if valid_input:
             """)
 
 # Footer
-st.markdown('<div class="footer">NPV and IRR Visualizer | For educational purposes</div>', unsafe_allow_html=True)
+st.markdown('<div class="footer">NPV and IRR Visualizer |  | Developed by Prof. Marc Goergen with the help of ChatGPT, Perplexity and Claude</div>', unsafe_allow_html=True)
